@@ -9,7 +9,7 @@ def test_prediccion_valores_aproximados():
 
     # Comprobamos que los valores predichos estén cerca de los esperados
     np.testing.assert_allclose(
-        salida_predicha, salida_esperada, rtol=0.2,
+        salida_predicha, salida_esperada, rtol=0.15,
         err_msg=f"Predicción fuera del rango esperado: {salida_predicha}"
     )
 
