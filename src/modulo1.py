@@ -1,7 +1,8 @@
+# pylint: disable=no-name-in-module
 import tensorflow as tf
 import numpy as np
 from tensorflow import keras
-from tensorflow.keras import layers
+from tensorflow.keras import layers # pylint: disable=no-name-in-module
 import matplotlib.pyplot as plt
 
 consumo = np.array([[100], [200], [300], [400], [500], [600], [700], [800], [900], [1000]], dtype=float)
@@ -33,9 +34,34 @@ print("Entrenando....")
 historial = modelo.fit(consumo, necesidad, epochs=500, verbose=0)
 print("ya entrenado")
 
+# Gráfico de la pérdida
+plt.figure(figsize=(8, 4))
+plt.title("Evolución de la pérdida durante el entrenamiento")
 plt.xlabel("# vuelta")
 plt.ylabel("Mag de pérdida")
 plt.plot(historial.history["loss"])
+plt.grid(True)
+plt.show()
+
+def mostrar_regresion(modelo, consumo, necesidad):
+    """Grafica las curvas de regresión aprendidas por el modelo."""
+    x_vals = np.linspace(consumo.min(), consumo.max(), 100).reshape(-1, 1)
+    predicciones = modelo.predict(x_vals)
+
+    etiquetas = ["Casa A", "Casa B", "Casa C", "Casa D"]
+    plt.figure(figsize=(8, 5))
+    for i in range(4):
+        plt.scatter(consumo, necesidad[:, i], label=f"Datos reales {etiquetas[i]}", alpha=0.6)
+        plt.plot(x_vals, predicciones[:, i], label=f"Modelo {etiquetas[i]}")
+    
+    plt.title("Función de regresión del modelo predictivo")
+    plt.xlabel("Consumo total (kWh)")
+    plt.ylabel("Necesidad estimada (kWh)")
+    plt.legend()
+    plt.grid(True)
+    plt.show()
+
+mostrar_regresion(modelo, consumo, necesidad)
 
 print("hacemos una prediccion")
 ejemplo = np.array([[600]])
