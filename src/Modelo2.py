@@ -3,30 +3,45 @@ from keras.layers import Dense
 from keras.models import Sequential
 import matplotlib.pyplot as plt
 from sklearn.preprocessing import MinMaxScaler
+from joblib import dump
 
 dataset = np.loadtxt("../Data/libro1.csv", delimiter=',')
 
+Tiempo = dataset[:, 1]
 I = dataset[:, 0]
+
 I_prev = np.zeros_like(I)
 I_prev[2:] = I[:-2]
 I_prev[0:2] = I[0]
 
-Tiempo = dataset[:, 1]
+I_post = np.zeros_like(I)
+I_post[-2:] = np.nan
+I_post[-2:] = I[:2]
 
-Entrada = np.column_stack((I, I_prev,Tiempo))
+I_prev4 = np.zeros_like(I)
+I_prev4[4:] = I[:-4]
+I_prev4[0:4] = I[0]
+
+I_post4 = np.zeros_like(I)
+I_post4[-4:] = np.nan
+I_post4[-4:] = I[:4]
+
+Entrada = np.column_stack((I, I_prev, I_prev4, I_post4, I_post,Tiempo))
 Salida = dataset[:, 2]
 
-#normalización del modelo
 scaler_X = MinMaxScaler()
 scaler_y = MinMaxScaler()
 
 Entrada_norm = scaler_X.fit_transform(Entrada)
 Salida_norm = scaler_y.fit_transform(Salida.reshape(-1, 1))
 
+dump(scaler_X, 'scaler_X.save')
+dump(scaler_y, 'scaler_y.save')
 
 model = Sequential()
-model.add(Dense(32, input_dim = 3, activation ='relu')) 
+model.add(Dense(32, input_dim = 6, activation ='relu')) 
 model.add(Dense(16, activation='relu')) 
+model.add(Dense(8, activation= 'relu'))
 model.add(Dense(1, activation= 'linear'))
 
 model.compile(loss='mse', optimizer='adam', metrics=['mae'])
