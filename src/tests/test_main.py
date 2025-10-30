@@ -1,6 +1,6 @@
 import numpy as np
 import pytest
-from src.modulo1 import modelo  # Importamos el modelo entrenado
+from src.modelos.modulo1 import modelo  # Importamos el modelo entrenado
 
 def test_prediccion_valores_aproximados():
     entrada = np.array([[600.0]])

@@ -3,8 +3,16 @@ from keras.layers import Dense
 from keras.models import Sequential
 import matplotlib.pyplot as plt
 from sklearn.preprocessing import MinMaxScaler
+import os
 
-dataset = np.loadtxt("../Data/libro1.csv", delimiter=',')
+# Obtener la ruta del archivo actual (Modelo2.py)
+ruta_actual = os.path.dirname(os.path.abspath(__file__))
+
+# Construir la ruta absoluta hacia el CSV
+ruta_data = os.path.join(ruta_actual, "..", "Data", "libro1.csv")
+
+# Cargar el dataset de forma segura
+dataset = np.loadtxt(ruta_data, delimiter=',')
 
 I = dataset[:, 0]
 I_prev = np.zeros_like(I)
