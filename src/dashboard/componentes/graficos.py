@@ -14,7 +14,7 @@ def render_graficos():
     st.subheader("📊 Monitoreo de Variables del Sistema")
 
     # Generar datos simulados (para pruebas sin Raspberry ni Simulink)
-    tiempo = pd.date_range(datetime.now() - timedelta(minutes=10), periods=100, freq="6S")
+    tiempo = pd.date_range(datetime.now() - timedelta(minutes=10), periods=100, freq="6s")
     voltaje = 24 + 2 * np.sin(np.linspace(0, 6, 100))
     corriente = 5 + 0.5 * np.cos(np.linspace(0, 4, 100))
     potencia = voltaje * corriente / 100  # en W
