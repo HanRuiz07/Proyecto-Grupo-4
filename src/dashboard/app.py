@@ -1,6 +1,7 @@
 # Dashboard principal con Streamlit
 import sys
 import os
+import streamlit as st
 import numpy as np
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "../ModelPredict")))
 
@@ -11,7 +12,6 @@ if ruta_src not in sys.path:
     sys.path.append(ruta_src)
 
 
-import streamlit as st
 from componentes.header import render_header
 from componentes.estado_panel import render_estado_panel
 from componentes.graficos import render_graficos
@@ -44,14 +44,12 @@ def main():
         st.write("Introduce los últimos 5 valores de corriente obtenidos")
 
         i_post4 = st.number_input("Corriente actual", value=1.0)
-        i_post = st.number_input("Corriente 2 minutos antes", value=1.0)
-        i = st.number_input("Corriente 4 minutos antes", value=1.0)
-        i_prev = st.number_input("Corriente 6 minutos antes", value=1.0)
-        i_prev4 = st.number_input("Corriente 8 minutos antes", value=1.0)
+        i_post = st.number_input("Corriente 0.1 segundo antes", value=1.0)
+        i = st.number_input("Corriente 0.2 segundos antes", value=1.0)
+        i_prev = st.number_input("Corriente 0.3 segundos antes", value=1.0)
+        i_prev4 = st.number_input("Corriente 0.4 segundos antes", value=1.0)
 
-        tiempo = st.number_input("Tiempo", value=5.0)
-
-        nuevos_valores = np.array([[i, i_prev, i_prev4, i_post4, i_post, tiempo]])
+        nuevos_valores = np.array([[i, i_prev, i_prev4, i_post4, i_post, 98]])
 
         if st.button("🔮 Ejecutar modelo ML"):
             try:

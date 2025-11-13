@@ -64,8 +64,8 @@ def entrenar_modelo(datos):
     i_post[-2:] = i[-1]
 
     i_post4 = np.zeros_like(i)
-    i_post[:-4] = i[4:]
-    i_post[-4:] = i[-1]
+    i_post4[:-4] = i[4:]
+    i_post4[-4:] = i[-1]
 
     entrada = np.column_stack((i, i_prev, i_prev4, i_post4, i_post,tiempo))
     salida = tiempo_hasta_pico(datos, 1.2)
@@ -85,11 +85,12 @@ def entrenar_modelo(datos):
     model.add(Dense(32, input_dim = 6, activation ='relu'))
     model.add(Dense(16, activation='relu'))
     model.add(Dense(8, activation= 'relu'))
+    model.add(Dense(4,activation= 'relu'))
     model.add(Dense(1, activation= 'linear'))
 
     model.compile(loss='mse', optimizer='adam', metrics=['mae'])
 
-    historial = model.fit(entrada_norm, salida_norm, epochs=200, batch_size=16, verbose=1)
+    historial = model.fit(entrada_norm, salida_norm, epochs=100, batch_size=16, verbose=1)
 
     predicciones_norm = model.predict(entrada_norm)
     predicciones = scaler_y.inverse_transform(predicciones_norm)
@@ -119,7 +120,9 @@ def entrenar_modelo(datos):
     return model, scaler_x, scaler_y
 
 def guardar_modelo(modelo):
-    """Esta funcion guarda el modelo como un archivo keras para luego ser usado sin volver a entrenar el modelo"""
+    """
+    Esta funcion guarda el modelo como un archivo keras para luego ser usado sin volver a entrenar el modelo
+    """
     modelo.save("Modelo_entrenado.keras")
 
 def predecir(nuevos_valores):

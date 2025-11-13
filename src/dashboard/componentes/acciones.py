@@ -30,8 +30,9 @@ def render_acciones():
 
 
     if st.button("🔮 Ejecutar modelo predictivo"):
-
-
+        
+        nuevos_valores = dataset[:, 2]
+        
         pred = predecir(nuevos_valores)
         st.success(f"Predicción del modelo: {pred}")
         st.session_state["ultima_prediccion"] = pred

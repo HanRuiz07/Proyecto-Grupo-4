@@ -9,7 +9,7 @@ def render_header():
     Encabezado del dashboard con el título, hora actual y controles principales.
     """
     archivo = st.file_uploader("Seleccione su archivo csv", type = "csv")
-    
+
     # Título principal
     st.title("🌞 Automatizacion de Microred — Gemelo Digital + ML")
 
@@ -36,7 +36,7 @@ def render_header():
                 st.error("No se puede cargar el archivo CSV. Revise la selección.")
             else:
                 dataset = cargar_datos(archivo)
-    
+
             if dataset is not None:
                 st.success("Archivo cargado exitosamente")
                 st.session_state["dataset"] = dataset
@@ -46,14 +46,14 @@ def render_header():
         if st.button("🧠 Entrenar Nuevo Modelo ML"):
             if "dataset" in st.session_state:
                 model, scaler_x, scaler_y = entrenar_modelo(st.session_state["dataset"])
-                
+
                 if st.button("Presione para guardar el modelo"):
                        guardar_modelo(model)
-                       
+
                        st.success("Modelo guardado exitosamente")
             else:
                 st.error("No hay un csv cargado")
-    with col3:
+    with col3: #No se que hacer con esta wbada
         st.button("🚨 Simular Emergencia")
 
     st.divider()
