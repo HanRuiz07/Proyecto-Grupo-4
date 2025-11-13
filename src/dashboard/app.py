@@ -41,14 +41,14 @@ def main():
 
     with col1:
         st.subheader("📊 Modelo Predictivo")
-        st.write("Introduce los valores de entrada para realizar una predicción:")
+        st.write("Introduce los últimos 5 valores de corriente obtenidos")
 
-        i_post4 = st.number_input("Corriente actual", value=11.0)
-        i_post = st.number_input("Corriente 2 minutos antes", value=11.5)
-        i = st.number_input("Corriente 4 minutos antes", value=10.0)
-        i_prev = st.number_input("Corriente 6 minutos antes", value=9.5)
-        i_prev4 = st.number_input("Corriente 8 minutos antes", value=9.0)
-        
+        i_post4 = st.number_input("Corriente actual", value=1.0)
+        i_post = st.number_input("Corriente 2 minutos antes", value=1.0)
+        i = st.number_input("Corriente 4 minutos antes", value=1.0)
+        i_prev = st.number_input("Corriente 6 minutos antes", value=1.0)
+        i_prev4 = st.number_input("Corriente 8 minutos antes", value=1.0)
+
         tiempo = st.number_input("Tiempo", value=5.0)
 
         nuevos_valores = np.array([[i, i_prev, i_prev4, i_post4, i_post, tiempo]])

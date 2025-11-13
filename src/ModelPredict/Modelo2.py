@@ -19,56 +19,61 @@ def cargar_datos(csv):
     """
     try:
         print("Datos cargados exitosamente")
-        return np.loadtxt(csv, delimiter=',')
+        return np.genfromtxt(csv, delimiter=',', skip_header= 1, usecols=(0,1,2))
     except FileNotFoundError:
         print("Error al cargar el archivo")
 
-#dataset = np.loadtxt("Data/libro1.csv", delimiter=',')
+def tiempo_hasta_pico(datos, umbral):
+    """
+    Algoritmo para calcular cuanto tiempo falta para que la corriente supere un umbral de corriente
+    """
+    tiempo = np.arange(1, datos.shape[0]+1)*0.1
+    i = datos[:, 2]
 
-#Tiempo = dataset[:, 1]
-#I = dataset[:, 0]
+    faltante = np.zeros_like(i)
 
-#I_prev = np.zeros_like(I)
-#I_prev[2:] = I[:-2]
-#I_prev[0:2] = I[0]
+    for idx in range(len(i)):
 
-#I_post = np.zeros_like(I)
-#I_post[-2:] = np.nan
-#I_post[-2:] = I[:2]
+        indices_supera = np.where(i[idx:] > umbral)[0]
+        if indices_supera.size > 0:
+            j = indices_supera[0] + idx
+            faltante[idx] = tiempo[j] - tiempo[idx]
+        else:
 
-#I_prev4 = np.zeros_like(I)
-#I_prev4[4:] = I[:-4]
-#I_prev4[0:4] = I[0]
+            faltante[idx] = np.nan
 
-#I_post4 = np.zeros_like(I)
-#I_post4[-4:] = np.nan
-#I_post4[-4:] = I[:4]
+    return faltante
 
 def entrenar_modelo(datos):
     """
     Se define 4 valores de corriente extra y se entrena el modelo con 6 entradas
     """
-    tiempo = datos[:, 1]
-    i = datos[:, 0]
+    tiempo = np.arange(1, datos.shape[0]+1)*0.1
+    i = datos[:, 2]
 
     i_prev = np.zeros_like(i)
     i_prev[2:] = i[:-2]
     i_prev[0:2] = i[0]
 
-    i_post = np.zeros_like(i)
-    i_post[-2:] = np.nan
-    i_post[-2:] = i[:2]
-
     i_prev4 = np.zeros_like(i)
     i_prev4[4:] = i[:-4]
     i_prev4[0:4] = i[0]
 
+    i_post = np.zeros_like(i)
+    i_post[:-2] = i[2:]
+    i_post[-2:] = i[-1]
+
     i_post4 = np.zeros_like(i)
-    i_post4[-4:] = np.nan
-    i_post4[-4:] = i[:4]
+    i_post[:-4] = i[4:]
+    i_post[-4:] = i[-1]
 
     entrada = np.column_stack((i, i_prev, i_prev4, i_post4, i_post,tiempo))
-    salida = datos[:, 2]
+    salida = tiempo_hasta_pico(datos, 1.2)
+
+    mascara_valida = ~np.isnan(entrada).any(axis=1) & ~np.isnan(salida)
+    entrada = entrada[mascara_valida]
+    salida = salida[mascara_valida]
+    tiempo = tiempo[mascara_valida]
 
     scaler_x = MinMaxScaler()
     scaler_y = MinMaxScaler()
@@ -102,8 +107,8 @@ def entrenar_modelo(datos):
     fig2, ax2 = plt.subplots(figsize=(9,5))
     ax2.scatter(tiempo, salida, color='blue', label='Datos reales', alpha=0.7)
     ax2.scatter(tiempo, predicciones, color='red', label='Predicciones', alpha=0.7)
-    ax2.set_xlabel("Tiempo")
-    ax2.set_ylabel("Salida")
+    ax2.set_xlabel("Tiempo (0.1 s)")
+    ax2.set_ylabel("Tiempo faltante para superar 1.2 A")
     ax2.legend()
     ax2.grid(True)
     st.pyplot(fig2)
@@ -118,13 +123,13 @@ def guardar_modelo(modelo):
     modelo.save("Modelo_entrenado.keras")
 
 def predecir(nuevos_valores):
-    """Funcion que realiza una predicción con el modelo.keras la entrada a esta funcion debe ser un array"""
+    """Funcion que predice con el modelo.keras (la entrada a esta funcion debe ser un array)"""
     modelo = load_model("Modelo_entrenado.keras")
     scaler_x = load("scaler_X.save")
     scaler_y = load("scaler_y.save")
-    
+
     valores_norm =scaler_x.transform(nuevos_valores)
     prediccion_norm = modelo.predict(valores_norm)
     prediccion = scaler_y.inverse_transform(prediccion_norm)
-    
+
     return prediccion
