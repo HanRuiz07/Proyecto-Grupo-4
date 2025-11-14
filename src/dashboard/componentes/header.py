@@ -46,11 +46,9 @@ def render_header():
         if st.button("🧠 Entrenar Nuevo Modelo ML"):
             if "dataset" in st.session_state:
                 model, scaler_x, scaler_y = entrenar_modelo(st.session_state["dataset"])
-
-                if st.button("Presione para guardar el modelo"):
-                       guardar_modelo(model)
-
-                       st.success("Modelo guardado exitosamente")
+                st.session_state["modelo_entrenado"] = model
+                guardar_modelo(st.session_state["modelo_entrenado"])
+                st.success("Modelo entrenado y guardado")
             else:
                 st.error("No hay un csv cargado")
     with col3: #No se que hacer con esta wbada

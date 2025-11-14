@@ -50,6 +50,7 @@ def entrenar_modelo(datos):
     """
     tiempo = np.arange(1, datos.shape[0]+1)*0.1
     i = datos[:, 2]
+    gradiente_corrientes = np.gradient(i)
 
     i_prev = np.zeros_like(i)
     i_prev[2:] = i[:-2]
@@ -67,8 +68,8 @@ def entrenar_modelo(datos):
     i_post4[:-4] = i[4:]
     i_post4[-4:] = i[-1]
 
-    entrada = np.column_stack((i, i_prev, i_prev4, i_post4, i_post,tiempo))
-    salida = tiempo_hasta_pico(datos, 1.2)
+    entrada = np.column_stack((i, i_prev, i_prev4, i_post4, i_post, gradiente_corrientes, tiempo))
+    salida = tiempo_hasta_pico(datos, 1.3)
 
     mascara_valida = ~np.isnan(entrada).any(axis=1) & ~np.isnan(salida)
     entrada = entrada[mascara_valida]
@@ -82,7 +83,7 @@ def entrenar_modelo(datos):
     salida_norm = scaler_y.fit_transform(salida.reshape(-1, 1))
 
     model = Sequential()
-    model.add(Dense(32, input_dim = 6, activation ='relu'))
+    model.add(Dense(32, input_dim = 7, activation ='relu'))
     model.add(Dense(16, activation='relu'))
     model.add(Dense(8, activation= 'relu'))
     model.add(Dense(4,activation= 'relu'))
@@ -90,7 +91,7 @@ def entrenar_modelo(datos):
 
     model.compile(loss='mse', optimizer='adam', metrics=['mae'])
 
-    historial = model.fit(entrada_norm, salida_norm, epochs=100, batch_size=16, verbose=1)
+    historial = model.fit(entrada_norm, salida_norm, epochs=120, batch_size=16, verbose=1)
 
     predicciones_norm = model.predict(entrada_norm)
     predicciones = scaler_y.inverse_transform(predicciones_norm)

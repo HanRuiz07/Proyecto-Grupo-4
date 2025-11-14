@@ -15,7 +15,7 @@ if ruta_src not in sys.path:
 from componentes.header import render_header
 from componentes.estado_panel import render_estado_panel
 from componentes.graficos import render_graficos
-from ModelPredict.Modelo2 import cargar_datos, predecir  # ← integración del modelo ML
+from ModelPredict.Modelo2 import predecir  # ← integración del modelo ML
 
 # ------------------------------
 # Configuración general del dashboard
@@ -49,7 +49,9 @@ def main():
         i_prev = st.number_input("Corriente 0.3 segundos antes", value=1.0)
         i_prev4 = st.number_input("Corriente 0.4 segundos antes", value=1.0)
 
-        nuevos_valores = np.array([[i, i_prev, i_prev4, i_post4, i_post, 98]])
+        gradiente = (i_post4-i_post)/0.1
+
+        nuevos_valores = np.array([[i, i_prev, i_prev4, i_post4, i_post, gradiente, 96]])
 
         if st.button("🔮 Ejecutar modelo ML"):
             try:
