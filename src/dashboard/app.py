@@ -43,15 +43,15 @@ def main():
         st.subheader("📊 Modelo Predictivo")
         st.write("Introduce los últimos 5 valores de corriente obtenidos")
 
-        i_post4 = st.number_input("Corriente actual", value=1.0)
-        i_post = st.number_input("Corriente 0.1 segundo antes", value=1.0)
-        i = st.number_input("Corriente 0.2 segundos antes", value=1.0)
-        i_prev = st.number_input("Corriente 0.3 segundos antes", value=1.0)
+        i = st.number_input("Corriente actual", value=1.0)
+        i_prev = st.number_input("Corriente 0.1 segundo antes", value=1.0)
+        i_prev2 = st.number_input("Corriente 0.2 segundos antes", value=1.0)
+        i_prev3 = st.number_input("Corriente 0.3 segundos antes", value=1.0)
         i_prev4 = st.number_input("Corriente 0.4 segundos antes", value=1.0)
 
-        gradiente = (i_post4-i_post)/0.1
+        gradiente = (i-i_prev)/0.1
 
-        nuevos_valores = np.array([[i, i_prev, i_prev4, i_post4, i_post, gradiente, 96]])
+        nuevos_valores = np.array([[i, i_prev, i_prev2, i_prev3, i_prev4, gradiente, 96]])
 
         if st.button("🔮 Ejecutar modelo ML"):
             try:

@@ -44,7 +44,7 @@ def tiempo_hasta_pico(datos, umbral):
 
     return faltante
 
-def entrenar_modelo(datos):
+def entrenar_modelo(datos, umbral):
     """
     Se define 4 valores de corriente extra y se entrena el modelo con 6 entradas
     """
@@ -53,23 +53,23 @@ def entrenar_modelo(datos):
     gradiente_corrientes = np.gradient(i)
 
     i_prev = np.zeros_like(i)
-    i_prev[2:] = i[:-2]
-    i_prev[0:2] = i[0]
+    i_prev[1:] = i[:-1]
+    i_prev[0:1] = i[0]
+
+    i_prev2 = np.zeros_like(i)
+    i_prev2[2:] = i[:-2]
+    i_prev2[0:2] = i[0]
+
+    i_prev3 = np.zeros_like(i)
+    i_prev3[3:] = i[:-3]
+    i_prev3[0:3] = i[0]
 
     i_prev4 = np.zeros_like(i)
     i_prev4[4:] = i[:-4]
     i_prev4[0:4] = i[0]
 
-    i_post = np.zeros_like(i)
-    i_post[:-2] = i[2:]
-    i_post[-2:] = i[-1]
-
-    i_post4 = np.zeros_like(i)
-    i_post4[:-4] = i[4:]
-    i_post4[-4:] = i[-1]
-
-    entrada = np.column_stack((i, i_prev, i_prev4, i_post4, i_post, gradiente_corrientes, tiempo))
-    salida = tiempo_hasta_pico(datos, 1.3)
+    entrada = np.column_stack((i, i_prev, i_prev2, i_prev3, i_prev4, gradiente_corrientes, tiempo))
+    salida = tiempo_hasta_pico(datos, umbral)
 
     mascara_valida = ~np.isnan(entrada).any(axis=1) & ~np.isnan(salida)
     entrada = entrada[mascara_valida]
@@ -137,3 +137,57 @@ def predecir(nuevos_valores):
     prediccion = scaler_y.inverse_transform(prediccion_norm)
 
     return prediccion
+
+def grafica_datos(datos, umbral):
+    """
+    Grafica la corriente entregada al modelo y resalta:
+    - Datos por debajo del umbral en azul atenuado
+    - Datos por encima del umbral en azul intenso
+    """
+
+    # Extraer corriente y eje de tiempo
+    tiempo = np.arange(1, datos.shape[0] + 1) * 0.1
+    corriente = datos[:, 2]
+
+    # Crear máscaras para clasificar los puntos
+    debajo = corriente <= umbral
+    encima = corriente > umbral
+
+    st.subheader("Gráfica de datos de corriente y umbral definido")
+
+    fig, ax = plt.subplots(figsize=(10, 5))
+
+    # Puntos por debajo del umbral → azul suave
+    ax.scatter(
+        tiempo[debajo],
+        corriente[debajo],
+        color='#7FBFFF',        # azul claro
+        label="Debajo del umbral",
+        alpha=0.6
+    )
+
+    # Puntos por encima del umbral → azul intenso
+    ax.scatter(
+        tiempo[encima],
+        corriente[encima],
+        color='#0055FF',        # azul fuerte
+        label="Encima del umbral",
+        alpha=0.9
+    )
+
+    # Línea del umbral
+    ax.axhline(
+        umbral,
+        color='red',
+        linestyle='--',
+        linewidth=1.5,
+        label=f"Umbral = {umbral} A"
+    )
+
+    ax.set_xlabel("Tiempo (s)")
+    ax.set_ylabel("Corriente (A)")
+    ax.set_title("Corriente vs Tiempo con Umbral")
+    ax.grid(True)
+    ax.legend()
+
+    st.pyplot(fig)
