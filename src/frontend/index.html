@@ -26,7 +26,7 @@
     </header>
 
     <!-- =========================================================
-         NAVBAR DE MODOS
+        NAVBAR DE MODOS
     ========================================================== -->
     <nav class="navbar-modes">
         <button class="mode-btn modo-btn active-mode" id="btn-manual">Manual</button>
@@ -143,7 +143,7 @@
                 </table>
 
                 <p id="manual-sensores-estado"
-                   style="margin-top:6px;font-size:12px;">Sensores en espera…</p>
+                style="margin-top:6px;font-size:12px;">Sensores en espera…</p>
             </article>
 
             <article class="card">
@@ -176,7 +176,7 @@
                     style="margin-top:10px;">Actualizar umbrales</button>
 
                 <p id="estado-umbrales-manual"
-                   style="margin-top:6px;font-size:12px;">Umbrales por defecto aplicados.</p>
+                style="margin-top:6px;font-size:12px;">Umbrales por defecto aplicados.</p>
             </article>
         </section>
 
@@ -197,7 +197,7 @@
                 </p>
 
                 <p id="diag-recomendaciones"
-                   style="margin-top:4px;font-size:12px;">
+                style="margin-top:4px;font-size:12px;">
                     Sin recomendaciones por ahora.
                 </p>
             </article>
@@ -220,21 +220,94 @@
         MODO AUTOMÁTICO
     ========================================================== -->
     <section id="modo-automatico" class="mode-section hidden">
-        <p style="padding:20px;color:#ccc;">Modo automático cargado.</p>
+        <section class="panel-grid">
+            <article class="card">
+                <h2>Estado EMS (Automático)</h2>
+                <div class="panel-grid">
+                    <div class="kpi-card">
+                        <div class="kpi-label">Activo</div>
+                        <div class="kpi-value" id="auto-estado">--</div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-label">Flujo energía</div>
+                        <div class="kpi-value" id="auto-flujo">--</div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-label">Última acción</div>
+                        <div class="kpi-value" id="auto-ultima-accion">--</div>
+                    </div>
+                </div>
+                <p style="margin-top:10px;font-size:13px;">Motivo: <span id="auto-motivo">--</span></p>
+            </article>
+
+            <article class="card">
+                <h2>Controles Automático</h2>
+                <div style="display:flex;gap:10px;align-items:center;">
+                    <button class="btn-primary" id="btn-auto-on">Activar</button>
+                    <button class="btn-primary" id="btn-auto-off">Desactivar</button>
+                    <button class="btn-primary" id="btn-auto-forzar">Forzar decisión</button>
+                </div>
+                <p style="margin-top:8px;font-size:12px;">Última actualización: <span id="auto-ts">--</span></p>
+            </article>
+        </section>
     </section>
 
     <!-- =========================================================
         MODO ML
     ========================================================== -->
     <section id="modo-ml" class="mode-section hidden">
-        <p style="padding:20px;color:#ccc;">Modo ML cargado.</p>
+        <section class="panel-grid">
+            <article class="card">
+                <h2>Información del Modelo</h2>
+                <div class="panel-grid">
+                    <div class="kpi-card"><div class="kpi-label">Modelo</div><div class="kpi-value" id="ml-modelo">--</div></div>
+                    <div class="kpi-card"><div class="kpi-label">MAPE</div><div class="kpi-value" id="ml-mape">--</div></div>
+                    <div class="kpi-card"><div class="kpi-label">Último entrenamiento</div><div class="kpi-value" id="ml-train">--</div></div>
+                </div>
+                <p style="margin-top:8px;font-size:13px;">Arquitectura: <span id="ml-arquitectura">--</span></p>
+                <p style="margin-top:6px;font-size:13px;">Variables: <span id="ml-variables">--</span></p>
+            </article>
+
+            <article class="card">
+                <h2>Predicción</h2>
+                <p style="font-size:13px;color:#cbd5e1;">Introduce corrientes separadas por comas (ej: 1.2,0.8,0.5)</p>
+                <textarea id="ml-input-corriente" style="width:100%;height:70px;background:#021026;color:#e2e8f0;border-radius:8px;padding:8px;"></textarea>
+                <div style="display:flex;gap:8px;margin-top:8px;">
+                    <button class="btn-primary" id="btn-ml-predict" onclick="predecir()">Predecir</button>
+                </div>
+                <p style="margin-top:8px;font-size:13px;">Resultado: <span id="ml-result">--</span></p>
+            </article>
+        </section>
     </section>
 
     <!-- =========================================================
         MODO CONECTAR
     ========================================================== -->
     <section id="modo-conectar" class="mode-section hidden">
-        <p style="padding:20px;color:#ccc;">Modo conectar cargado.</p>
+        <section class="panel-grid">
+            <article class="card">
+                <h2>Pruebas de Conexión</h2>
+                <div style="display:flex;gap:8px;flex-wrap:wrap;">
+                    <button class="btn-primary" onclick="probarConexion()">Probar Backend</button>
+                    <button class="btn-primary" onclick="mqttLeer()">Probar MQTT</button>
+                    <button class="btn-primary" onclick="mqttComando()">Enviar Comando MQTT</button>
+                    <button class="btn-primary" onclick="mqttRelay('on')">Relay ON</button>
+                    <button class="btn-primary" onclick="mqttRelay('off')">Relay OFF</button>
+                    <button class="btn-primary" onclick="probarWebSocket()">Probar WebSocket</button>
+                    <button class="btn-primary" onclick="probarDB()">Probar DB</button>
+                </div>
+                <p style="margin-top:8px;font-size:13px;">Diagnóstico: <span id="conectar-diagnostico">--</span></p>
+                <p style="margin-top:6px;font-size:13px;">MQTT: <span id="mqtt-test-resultado">--</span></p>
+            </article>
+
+            <article class="card">
+                <h2>DB Test</h2>
+                <p>Estado: <span id="conect-db-estado">--</span></p>
+                <p>Última escritura: <span id="conect-db-last-write">--</span></p>
+                <p>Última lectura: <span id="conect-db-last-read">--</span></p>
+                <p>Muestras: <span id="conect-db-muestras">--</span></p>
+            </article>
+        </section>
     </section>
 
 
@@ -256,6 +329,54 @@
     ========================================================== -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script type="module" src="./js/main.js"></script>
+
+    <!-- Fallback ligero: si los módulos no cargan, este script simple permite cambiar modos -->
+    <script>
+        (function(){
+            function setModoFallback(modo){
+                try{
+                    ["manual","automatico","ml","conectar"].forEach(m => {
+                        const btn = document.getElementById(`btn-${m}`);
+                        if(btn) btn.classList.remove('active-mode');
+                        const sec = document.getElementById(`modo-${m}`);
+                        if(sec) sec.classList.add('hidden');
+                    });
+
+                    const btnAct = document.getElementById(`btn-${modo}`);
+                    if(btnAct) btnAct.classList.add('active-mode');
+                    const secAct = document.getElementById(`modo-${modo}`);
+                    if(secAct) secAct.classList.remove('hidden');
+
+                    // Mostrar aviso visible en la parte superior temporal
+                    let banner = document.getElementById('modo-banner-fallback');
+                    if(!banner){
+                        banner = document.createElement('div');
+                        banner.id = 'modo-banner-fallback';
+                        banner.style.position = 'fixed';
+                        banner.style.left = '50%';
+                        banner.style.top = '8px';
+                        banner.style.transform = 'translateX(-50%)';
+                        banner.style.padding = '8px 14px';
+                        banner.style.background = '#38bdf8';
+                        banner.style.color = '#021026';
+                        banner.style.borderRadius = '10px';
+                        banner.style.zIndex = 10000;
+                        document.body.appendChild(banner);
+                    }
+                    banner.textContent = `Modo: ${modo} (fallback)`;
+                    setTimeout(()=>{ if(banner) banner.remove(); }, 2200);
+                }catch(e){ console.warn('Fallback setModo error', e); }
+            }
+
+            // Enlazar botones del navbar
+            try{
+                ["manual","automatico","ml","conectar"].forEach(m => {
+                    const el = document.getElementById(`btn-${m}`);
+                    if(el) el.addEventListener('click', ()=> setModoFallback(m));
+                });
+            }catch(e){ /* no bloquear */ }
+        })();
+    </script>
 
 </body>
 </html>

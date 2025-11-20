@@ -1,6 +1,6 @@
 # tests/test_db.py
 from unittest.mock import patch
-from src.backend.database.db import get_conn, guardar_telemetria, obtener_historico
+from src.backend.database.db import get_conn, insertar_telemetria, obtener_historico
 
 
 def test_db_connection_mock():
@@ -14,10 +14,10 @@ def test_db_connection_mock():
 def test_db_guardar_telemetria_sin_db():
     muestra = {
         "timestamp": 123,
-        "voltaje_pv": 12.5,
-        "corriente_pv": 1.2,
+        "pv_voltage": 12.5,
+        "pv_current": 1.2,
         "soc": 85.0,
-        "temperatura": 28.0,
+        "temperature_ambient": 28.0,
         "potencia_carga": 15.2,
         "relay_estado": 1,
     }
@@ -25,7 +25,7 @@ def test_db_guardar_telemetria_sin_db():
     # Simular que no hay conexión a DB
     with patch("src.backend.database.db.get_conn", return_value=None):
         try:
-            guardar_telemetria(muestra)
+            insertar_telemetria(muestra)
             ok = True
         except Exception:
             ok = False
@@ -35,6 +35,6 @@ def test_db_guardar_telemetria_sin_db():
 
 def test_db_obtener_historico_sin_db():
     # Sin DB debe devolver lista vacía, NO lanzar excepción
-    with patch("src.backend...database.db.get_conn", return_value=None):
+    with patch("src.backend.database.db.get_conn", return_value=None):
         rows = obtener_historico(10)
         assert isinstance(rows, list)

@@ -38,6 +38,14 @@ async def broadcast(payload: Dict[str, Any]) -> None:
     if not _WS_CLIENTS:
         return
 
+    # Aseguramos formato consistente: si el payload no trae 'tipo', lo envolvemos
+    if not isinstance(payload, dict):
+        print("[WS] Advertencia: payload no es dict, se ignora.")
+        return
+
+    if "tipo" not in payload:
+        payload = {"tipo": "broadcast", "data": payload}
+
     vivos: List[WebSocket] = []
     for ws in _WS_CLIENTS:
         ok = await _safe_send(ws, payload)
@@ -74,8 +82,10 @@ async def multiplexor_ws(message: Any, ws: WebSocket | None, state: Dict[str, An
     # CASO 2: backend → broadcast
     # -------------------------------
     if ws is None:
-        # Se asume que message ya es dict listo para enviar
+        # Se asume que message ya es dict listo para enviar. Si no tiene 'tipo', lo envolvemos.
         if isinstance(message, dict):
+            if "tipo" not in message:
+                message = {"tipo": "broadcast", "data": message}
             await broadcast(message)
         else:
             print("[WS] Advertencia: mensaje backend no es dict, se ignora.")

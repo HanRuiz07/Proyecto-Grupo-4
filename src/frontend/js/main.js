@@ -25,6 +25,7 @@ import {
 import {
     mlMode
 } from "./modes/ml.js";
+import { predecir } from "./modes/ml.js";
 
 import {
     conectarMode,
@@ -98,6 +99,9 @@ window.addEventListener("load", () => {
 window.setModo = (modo) => {
     setModoInterno(modo);
 };
+
+// Exponer predict para ML
+window.predecir = predecir;
 
 // ----------------------------------------------------------------------
 // ASIGNAR EVENTOS A LOS BOTONES DEL NAVBAR

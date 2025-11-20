@@ -231,3 +231,8 @@ def iniciar_mqtt(state: Dict[str, Any] | None = None) -> None:
     hilo.start()
 
     print("[MQTT] Cliente MQTT corriendo en hilo separado.")
+
+# ============================================================
+# Nota: el cliente WebSocket es parte del frontend (JS) y no debe
+# incluirse en este archivo Python. La lógica del WebSocket del
+# frontend vive en `src/frontend/js/core/websocket.js`.

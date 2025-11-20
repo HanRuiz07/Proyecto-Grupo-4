@@ -12,27 +12,44 @@ import { mlMode } from "../modes/ml.js";
 import { conectarMode } from "../modes/conectar.js";
 
 export async function setModo(modo) {
-    ["manual","automatico","ml","conectar"].forEach(m => {
-        const btn = document.getElementById(`btn-${m}`);
-        btn?.classList.remove("active-mode");
-    });
+    try {
+        console.log(`[tabs] setModo() llamado con: ${modo}`);
 
-    const btnActivo = document.getElementById(`btn-${modo}`);
-    btnActivo?.classList.add("active-mode");
+        ["manual","automatico","ml","conectar"].forEach(m => {
+            const btn = document.getElementById(`btn-${m}`);
+            if (btn) btn.classList.remove("active-mode");
+            else console.warn(`[tabs] btn-${m} no encontrado`);
+        });
 
-    ["manual","automatico","ml","conectar"].forEach(m => {
-        document.getElementById(`modo-${m}`)?.classList.add("hidden");
-    });
+        const btnActivo = document.getElementById(`btn-${modo}`);
+        if (btnActivo) btnActivo.classList.add("active-mode");
+        else console.warn(`[tabs] btn activo no encontrado: btn-${modo}`);
 
-    document.getElementById(`modo-${modo}`)?.classList.remove("hidden");
+        ["manual","automatico","ml","conectar"].forEach(m => {
+            const sec = document.getElementById(`modo-${m}`);
+            if (sec) sec.classList.add("hidden");
+            else console.warn(`[tabs] sección no encontrada: modo-${m}`);
+        });
 
-    state.modo = modo;
-    addLog(`Modo cambiado a: ${modo}`);
+        const secAct = document.getElementById(`modo-${modo}`);
+        if (secAct) {
+            secAct.classList.remove("hidden");
+            console.log(`[tabs] se mostró sección: modo-${modo}`);
+        } else {
+            console.warn(`[tabs] sección activa no encontrada: modo-${modo}`);
+        }
 
-    if (modo === "manual") manualMode.init();
-    if (modo === "automatico") autoMode.init();
-    if (modo === "ml") mlMode.init();
-    if (modo === "conectar") conectarMode.init();
+        state.modo = modo;
+        addLog(`Modo cambiado a: ${modo}`);
 
-    alert("green", `Modo ${modo} cargado`);
+        // Llamadas a inicializadores (si existen)
+        try { if (modo === "manual" && manualMode?.init) manualMode.init(); } catch (e) { console.error(e); }
+        try { if (modo === "automatico" && autoMode?.init) autoMode.init(); } catch (e) { console.error(e); }
+        try { if (modo === "ml" && mlMode?.init) mlMode.init(); } catch (e) { console.error(e); }
+        try { if (modo === "conectar" && conectarMode?.init) conectarMode.init(); } catch (e) { console.error(e); }
+
+        alert("green", `Modo ${modo} cargado`);
+    } catch (err) {
+        console.error('[tabs] Error en setModo:', err);
+    }
 }

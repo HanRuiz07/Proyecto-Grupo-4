@@ -1,5 +1,6 @@
 # tests/test_mqtt.py
-from src.backend.mqtt.cliente import enviar_comando_mqtt
+from src.backend.mqtt.cliente import publicar_mqtt
+
 
 def test_mqtt_enviar_comando_no_revienta():
     """
@@ -7,7 +8,7 @@ def test_mqtt_enviar_comando_no_revienta():
     aunque no haya broker MQTT disponible.
     """
     try:
-        enviar_comando_mqtt("relay_on")
+        publicar_mqtt("microrred/comando", {"comando": "relay_on"})
         ok = True
     except Exception:
         ok = False

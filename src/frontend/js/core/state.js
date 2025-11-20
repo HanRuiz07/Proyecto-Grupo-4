@@ -26,7 +26,10 @@ export const state = {
     wsRetryCount: 0,
 
     config: {
-        api_base: `${window.location.protocol}//${window.location.hostname}:8000`,
-        ws_url: `ws://${window.location.hostname}:8000/ws`
+        // Llevamos el prefijo `/api` para que las llamadas `safeFetch('/ml/info')`
+        // se resuelvan a `http://host:8000/api/ml/info`.
+        api_base: `${window.location.protocol}//${window.location.hostname}:8000/api`,
+        // WebSocket ahora apunta al endpoint real del backend `/api/live`.
+        ws_url: `ws://${window.location.hostname}:8000/api/live`
     }
 };

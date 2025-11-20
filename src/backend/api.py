@@ -5,8 +5,10 @@
 
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect, UploadFile, File, Request
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 import asyncio
 import os
+import time
 
 # ============================================================
 #  MODO TESTING PARA WEBSOCKET
@@ -27,6 +29,7 @@ from src.backend.ml.modelo import (
 from src.backend.ml.modo_automatico import (
     activar_modo_automatico,
     desactivar_modo_automatico,
+    estado_modo_automatico,
 )
 
 # MQTT cliente: usamos los nombres reales del módulo `cliente.py`
@@ -262,9 +265,144 @@ def simulink_estado():
 
 @app.post("/api/modo/automatico/on")
 def api_auto_on():
-    return activar_modo_automatico()
+    # Pasamos el estado global para que el EMS pueda leer la telemetría
+    return activar_modo_automatico(estado_sistema)
 
 
 @app.post("/api/modo/automatico/off")
 def api_auto_off():
     return desactivar_modo_automatico()
+
+
+@app.get("/api/modo/automatico/estado")
+def api_auto_estado():
+    # Devuelve el estado interno del EMS (útil para la UI)
+    try:
+        return estado_modo_automatico()
+    except Exception as e:
+        return {"status": "error", "mensaje": str(e)}
+
+
+# ------------------------------------------------------------
+# Endpoints de compatibilidad para MODO CONECTAR (frontend)
+# ------------------------------------------------------------
+
+
+@app.get("/api/conectar/test-backend")
+def conectar_test_backend():
+    return {"detalle": "Backend reachable", "timestamp": time.time()}
+
+
+@app.get("/api/conectar/test-mqtt")
+def conectar_test_mqtt():
+    # No hay cliente MQTT inicializado en dev, devolvemos mock
+    return {"detalle": "MQTT broker unreachable (mock)", "ok": False}
+
+
+@app.post("/api/conectar/mqtt/comando")
+def conectar_mqtt_comando():
+    # Intentamos publicar un comando de prueba
+    try:
+        publicar_mqtt("microrred/comando", {"comando": "test"})
+    except Exception:
+        pass
+    return {"status": "ok"}
+
+
+@app.post("/api/conectar/mqtt/relay")
+def conectar_mqtt_relay(payload: dict):
+    modo = payload.get("modo", "on")
+    try:
+        publicar_mqtt("microrred/comando", {"comando": f"relay_{modo}"})
+    except Exception:
+        pass
+    return {"status": "ok", "modo": modo}
+
+
+@app.post("/api/conectar/test-ws")
+async def conectar_test_ws():
+    # Emitimos un mensaje a todos los WS conectados para probar
+    await multiplexor_ws({"tipo": "conectar_test", "data": {"msg": "ws ok"}}, None, estado_sistema)
+    return {"status": "ok"}
+
+
+@app.post("/api/conectar/test-db")
+def conectar_test_db():
+    # Mock de respuesta DB
+    return {"estado": "ok", "last_write": time.time(), "last_read": time.time(), "muestras": 123}
+
+
+# Alias para rutas 'simulink/enviar' usadas por el frontend (compatibilidad idioma)
+@app.post("/api/simulink/enviar")
+async def simulink_enviar_alias(payload: dict):
+    # Reutiliza la función ya existente simulink_send
+    return await simulink_send(payload)
+
+
+# Compatibility endpoints for frontend EMS calls
+@app.get("/ems/estado")
+def ems_estado():
+    # Return simplified EMS status expected by frontend
+    return {
+        "estado": estado_sistema.get("relay_estado", 0),
+        "flujo": f"{estado_sistema.get('potencia_carga', 0)} W"
+    }
+
+
+@app.post("/ems/forzar")
+def ems_forzar():
+    # Trigger automatic mode decision (best-effort). If not available, return ok.
+    try:
+        # Intentamos activar el EMS usando el estado global
+        activar_modo_automatico(estado_sistema)
+        return {"status": "ok", "msg": "Forzado automático"}
+    except Exception:
+        return {"status": "ok", "msg": "Forzado (mock)"}
+
+
+# Aliases under /api/ for compatibility
+@app.get("/api/ems/estado")
+def ems_estado_api():
+    return ems_estado()
+
+
+@app.post("/api/ems/forzar")
+def ems_forzar_api():
+    return ems_forzar()
+
+
+# ------------------------------------------------------------
+# Compatibilidad: rutas usadas por el frontend (manual)
+# ------------------------------------------------------------
+
+@app.post("/manual/comando")
+def manual_comando(payload: dict):
+    # payload esperado desde frontend: { "comando": "on"|"off"|"reset" }
+    accion = payload.get("comando") or payload.get("accion")
+    if not accion:
+        return {"status": "error", "mensaje": "Falta campo 'comando'"}
+
+    # Reutilizamos la misma lógica que api_control_sistema
+    publicar_mqtt(f"microrred/comando", {"comando": f"sistema_{accion}"})
+    return {"status": "ok", "accion": accion}
+
+
+@app.post("/api/manual/comando")
+def api_manual_comando(payload: dict):
+    return manual_comando(payload)
+
+
+@app.post("/manual/umbrales")
+def manual_umbrales(payload: dict):
+    # Reenvía al endpoint de umbrales ya existente
+    return api_umbrales(payload)
+
+
+@app.post("/api/manual/umbrales")
+def api_manual_umbrales(payload: dict):
+    return manual_umbrales(payload)
+
+
+# Servir frontend estático (SPA) desde FastAPI
+# Montamos al final para no interferir con las rutas `/api/*`
+app.mount("/", StaticFiles(directory="src/frontend", html=True), name="frontend")

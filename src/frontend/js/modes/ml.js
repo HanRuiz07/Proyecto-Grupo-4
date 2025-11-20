@@ -19,3 +19,19 @@ export const mlMode = {
         }
     }
 };
+
+export async function predecir() {
+    try {
+        const raw = document.getElementById('ml-input-corriente')?.value || '';
+        const arr = raw.split(',').map(s => parseFloat(s.trim())).filter(n => !isNaN(n));
+        const r = await safeFetch('/ml/predict', { method: 'POST', body: JSON.stringify({ corriente: arr }) });
+        if (r && r.status === 'ok') {
+            document.getElementById('ml-result').textContent = JSON.stringify(r.prediccion);
+        } else if (r) {
+            document.getElementById('ml-result').textContent = r.mensaje || JSON.stringify(r);
+        }
+    } catch (e) {
+        console.error('Error predict', e);
+        document.getElementById('ml-result').textContent = 'Error';
+    }
+}
