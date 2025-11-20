@@ -4,13 +4,15 @@
 # ============================================================
 
 import json
-from typing import Any, Dict, List
+import asyncio
+from typing import Any, Dict, List, Optional
 from fastapi import WebSocket
 
 from src.backend.database.db import obtener_historico
 
 # Lista global de clientes WebSocket conectados
 _WS_CLIENTS: List[WebSocket] = []
+_EVENT_LOOP: Optional[asyncio.AbstractEventLoop] = None
 
 
 # ------------------------------------------------------------
@@ -58,6 +60,30 @@ async def broadcast(payload: Dict[str, Any]) -> None:
     _WS_CLIENTS[:] = vivos
 
 
+async def broadcast_tipo(tipo: str, data: Any) -> None:
+    """
+    Envia un mensaje tipado `{'tipo': tipo, 'data': data}` a todos los clientes.
+    Uso asíncrono dentro del loop de asyncio.
+    """
+    await broadcast({"tipo": tipo, "data": data})
+
+
+def broadcast_from_thread(tipo: str, data: Any) -> None:
+    """
+    Función segura para usar desde hilos (thread) síncronos.
+    Publica la tarea en el event loop principal si está almacenado.
+    """
+    global _EVENT_LOOP
+    if _EVENT_LOOP is None:
+        print("[WS] No hay event loop registrado; no se puede emitir desde thread.")
+        return
+
+    try:
+        asyncio.run_coroutine_threadsafe(broadcast({"tipo": tipo, "data": data}), _EVENT_LOOP)
+    except Exception as e:
+        print(f"[WS] Error programando broadcast desde thread: {e}")
+
+
 # ------------------------------------------------------------
 #  MULTIPLEXOR PRINCIPAL
 # ------------------------------------------------------------
@@ -98,6 +124,16 @@ async def multiplexor_ws(message: Any, ws: WebSocket | None, state: Dict[str, An
     if ws not in _WS_CLIENTS:
         _WS_CLIENTS.append(ws)
         print(f"[WS] Nuevo cliente registrado. Total: {len(_WS_CLIENTS)}")
+
+        # Guardar event loop principal para permitir emisiones desde hilos
+        global _EVENT_LOOP
+        try:
+            if _EVENT_LOOP is None:
+                _EVENT_LOOP = asyncio.get_running_loop()
+                print("[WS] Event loop principal registrado para emisiones desde hilos.")
+        except RuntimeError:
+            # Si por alguna razón no hay loop en ejecución, lo ignoramos
+            pass
 
     # Parsear el mensaje si es string
     if isinstance(message, str):

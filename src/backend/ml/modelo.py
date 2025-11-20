@@ -9,10 +9,27 @@ import numpy as np
 from datetime import datetime
 
 from sklearn.metrics import mean_absolute_percentage_error
-from tensorflow.keras.models import load_model
-import joblib
+
+# Evitar importar TensorFlow / joblib en el momento de importación del módulo
+# (carga pesada). Importaremos dinámicamente dentro de `cargar_modelo()`
+TESTING = os.getenv("TESTING", "0") == "1"
+
+if not TESTING:
+    try:
+        from tensorflow.keras.models import load_model
+    except Exception:
+        load_model = None
+    try:
+        import joblib
+    except Exception:
+        joblib = None
+else:
+    # En modo testing no importamos dependencias pesadas
+    load_model = None
+    joblib = None
 
 from src.backend.database.db import obtener_historico
+from src.backend.utils.websocket_multiplexer import broadcast_from_thread
 
 # ------------------------------------------------------------
 # RUTAS DE ARCHIVOS ML
@@ -36,16 +53,27 @@ _scaler_y = None
 def cargar_modelo():
     global _model, _scaler_X, _scaler_y
 
+    # Import dinámico de dependencias pesadas
     try:
-        _model = load_model(MODEL_PATH)
+        from tensorflow.keras.models import load_model as _load_model
+        import joblib as _joblib
+    except Exception as e:
+        print(f"[ML] Import dinámico falló o dependencias no disponibles: {e}")
+        _model = None
+        _scaler_X = None
+        _scaler_y = None
+        return
+
+    try:
+        _model = _load_model(MODEL_PATH)
         print(f"[ML] Modelo cargado desde {MODEL_PATH}")
     except Exception as e:
         print(f"[ML] ❌ No se pudo cargar el modelo: {e}")
         _model = None
 
     try:
-        _scaler_X = joblib.load(SCALER_X_PATH)
-        _scaler_y = joblib.load(SCALER_Y_PATH)
+        _scaler_X = _joblib.load(SCALER_X_PATH)
+        _scaler_y = _joblib.load(SCALER_Y_PATH)
         print("[ML] Scalers cargados correctamente.")
     except Exception as e:
         print(f"[ML] ❌ No se pudo cargar scaler_X o scaler_y: {e}")
@@ -133,6 +161,12 @@ def predecir_tiempo(features: dict):
         "unidad": "minutos",
         "timestamp": datetime.utcnow().isoformat()
     }
+
+    # Emitir predicción ML por WebSocket (desde hilos/síncrono)
+    try:
+        broadcast_from_thread("ml_pred", out)
+    except Exception:
+        pass
 
     return out
 

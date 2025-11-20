@@ -10,8 +10,9 @@ services:
       context: .
       dockerfile: dockerfile.frontend
     container_name: microrred-frontend
+    # Bind frontend to specific host IP and port 8080
     ports:
-      - "8080:80"
+      - "172.232.188.183:8080:80"
     depends_on:
       - backend
     restart: unless-stopped
@@ -26,10 +27,12 @@ services:
       context: .
       dockerfile: dockerfile.backend
     container_name: microrred-backend
+    # Bind backend to host IP 172.232.188.183 and host port 8081 -> container 8000
     ports:
-      - "8000:8000"
+      - "172.232.188.183:8081:8000"
     environment:
       MQTT_BROKER: mqtt
+      BACKEND_URL: "http://172.232.188.183:8081"
       DB_HOST: timescaledb
       DB_PORT: 5432
       DB_NAME: microred

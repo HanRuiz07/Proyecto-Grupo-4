@@ -26,10 +26,10 @@ export const state = {
     wsRetryCount: 0,
 
     config: {
-        // Llevamos el prefijo `/api` para que las llamadas `safeFetch('/ml/info')`
-        // se resuelvan a `http://host:8000/api/ml/info`.
-        api_base: `${window.location.protocol}//${window.location.hostname}:8000/api`,
-        // WebSocket ahora apunta al endpoint real del backend `/api/live`.
-        ws_url: `ws://${window.location.hostname}:8000/api/live`
+        // Usar puertos explícitos para frontend/backend en el entorno del usuario.
+        // Frontend estará servido en el puerto 8080 y el backend en 8081.
+        api_base: `${window.location.protocol}//${window.location.hostname}:8081/api`,
+        // WebSocket apunta al backend en el puerto 8081
+        ws_url: `ws://${window.location.hostname}:8081/api/live`
     }
 };

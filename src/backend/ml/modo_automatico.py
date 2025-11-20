@@ -14,6 +14,7 @@ from typing import Dict, Any, Optional
 
 from src.backend.mqtt.cliente import publicar_mqtt
 from src.backend.ml.modelo import predecir_tiempo
+from src.backend.utils.websocket_multiplexer import broadcast_from_thread
 
 # ------------------------------------------------------------
 # UMBRALES DEL EMS (configurables por variables de entorno)
@@ -72,6 +73,11 @@ def activar_modo_automatico(state: Dict[str, Any]) -> Dict[str, Any]:
     _ems_thread.start()
 
     print("[EMS] Modo automático ACTIVADO.")
+    try:
+        # Emitir estado EMS a través de WebSocket para que frontend se actualice
+        broadcast_from_thread("ems_estado", dict(_ems_estado))
+    except Exception:
+        pass
     return {"status": "ok", "msg": "EMS activado."}
 
 
@@ -83,6 +89,10 @@ def desactivar_modo_automatico() -> Dict[str, Any]:
     _ems_activo = False
     _ems_estado["activo"] = False
     print("[EMS] Modo automático DESACTIVADO.")
+    try:
+        broadcast_from_thread("ems_estado", dict(_ems_estado))
+    except Exception:
+        pass
     return {"status": "ok", "msg": "EMS desactivado."}
 
 
@@ -246,6 +256,10 @@ def _evaluar_reglas(s: Dict[str, Any], ciclo: int) -> None:
             "load_current": i_load,
             "modo": modo,
         }
+        try:
+            broadcast_from_thread("ems_estado", dict(_ems_estado))
+        except Exception:
+            pass
         return
 
     # -------------------------------------------
@@ -281,6 +295,10 @@ def _evaluar_reglas(s: Dict[str, Any], ciclo: int) -> None:
     }
 
     print(f"[EMS] Acción: {accion_main} | Motivo: {motivo_main} | pred={pred_min} min")
+    try:
+        broadcast_from_thread("ems_estado", dict(_ems_estado))
+    except Exception:
+        pass
 
 
 # ============================================================
