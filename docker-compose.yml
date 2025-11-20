@@ -1,0 +1,91 @@
+version: "3.9"
+
+services:
+
+  # ============================
+  # FRONTEND (NGINX)
+  # ============================
+  frontend:
+    build:
+      context: .
+      dockerfile: dockerfile.frontend
+    container_name: microrred-frontend
+    ports:
+      - "8080:80"
+    depends_on:
+      - backend
+    restart: unless-stopped
+    networks:
+      - microred-net
+
+  # ============================
+  # BACKEND FASTAPI
+  # ============================
+  backend:
+    build:
+      context: .
+      dockerfile: dockerfile.backend
+    container_name: microrred-backend
+    ports:
+      - "8000:8000"
+    environment:
+      MQTT_BROKER: mqtt
+      DB_HOST: timescaledb
+      DB_PORT: 5432
+      DB_NAME: microred
+      DB_USER: admin
+      DB_PASS: admin123
+      MATLAB_REAL: "0"              # 0=MOCK, 1=MATLAB real
+    depends_on:
+      mqtt:
+        condition: service_started
+      timescaledb:
+        condition: service_healthy
+    restart: unless-stopped
+    networks:
+      - microred-net
+
+  # ============================
+  # MQTT BROKER (ECLIPSE MOSQUITTO)
+  # ============================
+  mqtt:
+    image: eclipse-mosquitto:2
+    container_name: microrred-mqtt
+    ports:
+      - "1883:1883"
+      - "9001:9001"
+    volumes:
+      - ./mosquitto.conf:/mosquitto/config/mosquitto.conf
+    restart: unless-stopped
+    networks:
+      - microred-net
+
+  # ============================
+  # TIMESCALEDB / POSTGRES
+  # ============================
+  timescaledb:
+    image: timescale/timescaledb:latest-pg14
+    container_name: microrred-db
+    environment:
+      POSTGRES_DB: microred
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin123
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./data-db:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U admin -d microred"]
+      interval: 5s
+      retries: 10
+    restart: unless-stopped
+    networks:
+      - microred-net
+
+
+# ============================
+# NETWORKS
+# ============================
+networks:
+  microred-net:
+    driver: bridge

@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8" />
+    <title>Microrred Inteligente + Gemelo Digital + ML</title>
+
+    <!-- Estilos industriales -->
+    <link rel="stylesheet" href="style.css" />
+
+    <!-- Iconos -->
+    <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+</head>
+
+<body>
+
+    <!-- =========================================================
+        HEADER
+    ========================================================== -->
+    <header class="header">
+        <h1>MICRORRED INTELIGENTE + GEMELO DIGITAL + ML</h1>
+        <div class="header-right">
+            <span id="clock"><span id="hora-actual"></span></span>
+            <button class="btn-logs" id="btn-logs">LOGS</button>
+        </div>
+    </header>
+
+    <!-- =========================================================
+         NAVBAR DE MODOS
+    ========================================================== -->
+    <nav class="navbar-modes">
+        <button class="mode-btn modo-btn active-mode" id="btn-manual">Manual</button>
+        <button class="mode-btn modo-btn" id="btn-automatico">Automático</button>
+        <button class="mode-btn modo-btn" id="btn-ml">Predicción ML</button>
+        <button class="mode-btn modo-btn" id="btn-conectar">Conectar</button>
+    </nav>
+
+    <!-- =========================================================
+        MODO MANUAL (RF1 – control directo + RF3 + RF4)
+    ========================================================== -->
+    <section id="modo-manual" class="mode-section">
+
+        <!-- FILA 1 -->
+        <section class="panel-grid">
+            <article class="card">
+                <h2>Estado general de la microrred</h2>
+                <div class="panel-grid">
+                    <div class="kpi-card">
+                        <div class="kpi-label">Potencia PV total</div>
+                        <div class="kpi-value" id="manual-pv-potencia">-- W</div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-label">Potencia de carga</div>
+                        <div class="kpi-value" id="potencia-carga">0 W</div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-label">Estado energético</div>
+                        <div class="kpi-value" id="manual-estado-energia">--</div>
+                    </div>
+                </div>
+                <p style="margin-top:10px;font-size:13px;">
+                    Flujo energético:
+                    <span id="manual-flujo-energia">PV → Batería / Carga</span>
+                </p>
+            </article>
+
+            <article class="card">
+                <h2>Control del sistema</h2>
+
+                <div style="display:flex;justify-content:center;gap:22px;margin-bottom:10px;">
+                    <button class="btn-circle btn-circle-green" id="btn-sys-on">
+                        <i class="fa-solid fa-power-off" style="font-size:26px;"></i>
+                    </button>
+                    <button class="btn-circle btn-circle-red" id="btn-sys-off">
+                        <i class="fa-solid fa-plug-circle-xmark" style="font-size:26px;"></i>
+                    </button>
+                    <button class="btn-circle btn-circle-yellow" id="btn-sys-emerg">
+                        <i class="fa-solid fa-triangle-exclamation" style="font-size:26px;"></i>
+                    </button>
+                </div>
+
+                <label for="slider-potencia">Potencia de carga (%)</label>
+                <div class="slider-with-value">
+                    <input type="range" id="slider-potencia" min="0" max="100" value="75">
+                    <span id="slider-potencia-value" class="slider-value">75 %</span>
+                </div>
+
+                <p><b>Estado del sistema:</b> <span id="estado-sistema">OFF</span></p>
+                <p><b>Seguridad:</b> <span id="seguridad-sys">Verde</span></p>
+                <p><b>Último comando:</b> <span id="last-cmd-sys">--</span></p>
+            </article>
+
+            <article class="card">
+                <h2>Estado de la batería</h2>
+
+                <div class="panel-grid">
+                    <div class="kpi-card"><div class="kpi-label">SoC estimado</div><div class="kpi-value" id="manual-bateria-soc">-- %</div></div>
+                    <div class="kpi-card"><div class="kpi-label">Voltaje batería</div><div class="kpi-value" id="manual-bateria-v">-- V</div></div>
+                    <div class="kpi-card"><div class="kpi-label">Corriente batería</div><div class="kpi-value" id="manual-bateria-i">-- A</div></div>
+                    <div class="kpi-card"><div class="kpi-label">Temperatura batería</div><div class="kpi-value" id="manual-bateria-temp">-- °C</div></div>
+                </div>
+
+                <p><b>Estado:</b> <span id="manual-bateria-estado">--</span></p>
+                <p><b>Recomendación:</b> <span id="manual-bateria-recomendacion">--</span></p>
+            </article>
+        </section>
+
+        <!-- FILA 2 -->
+        <section class="panel-grid">
+            <article class="card">
+                <h2>Sensores PV, batería y carga</h2>
+
+                <table style="width:100%;font-size:13px;border-collapse:collapse;">
+                    <thead>
+                        <tr>
+                            <th style="text-align:left;">Canal</th>
+                            <th style="text-align:right;">V (V)</th>
+                            <th style="text-align:right;">I (A)</th>
+                            <th style="text-align:right;">P (W)</th>
+                        </tr>
+                    </thead>
+
+                    <tbody id="tabla-sensores-manual">
+                        <tr>
+                            <td>PV</td>
+                            <td id="manual-pv-v" style="text-align:right;">--</td>
+                            <td id="manual-pv-i" style="text-align:right;">--</td>
+                            <td id="manual-pv-p" style="text-align:right;">--</td>
+                        </tr>
+                        <tr>
+                            <td>Batería</td>
+                            <td id="manual-bat-v" style="text-align:right;">--</td>
+                            <td id="manual-bat-i" style="text-align:right;">--</td>
+                            <td id="manual-bat-p" style="text-align:right;">--</td>
+                        </tr>
+                        <tr>
+                            <td>Carga</td>
+                            <td id="manual-load-v" style="text-align:right;">--</td>
+                            <td id="manual-load-i" style="text-align:right;">--</td>
+                            <td id="manual-load-p" style="text-align:right;">--</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <p id="manual-sensores-estado"
+                   style="margin-top:6px;font-size:12px;">Sensores en espera…</p>
+            </article>
+
+            <article class="card">
+                <h2>Protecciones y umbrales</h2>
+
+                <label for="umbral-vbat-min">Voltaje mínimo batería (V)</label>
+                <div class="slider-with-value">
+                    <input id="umbral-vbat-min" type="range" min="10.5" max="13" step="0.1" value="11.5">
+                    <span class="slider-value" id="umbral-vbat-min-value">11.5 V</span>
+                </div>
+
+                <label for="umbral-ibat-max">Corriente máxima batería (A)</label>
+                <div class="slider-with-value">
+                    <input id="umbral-ibat-max" type="range" min="0.5" max="5" step="0.1" value="2.0">
+                    <span class="slider-value" id="umbral-ibat-max-value">2.0 A</span>
+                </div>
+
+                <label for="umbral-tbat-max">Temperatura máxima batería (°C)</label>
+                <div class="slider-with-value">
+                    <input id="umbral-tbat-max" type="range" min="20" max="60" step="1" value="45">
+                    <span class="slider-value" id="umbral-tbat-max-value">45 °C</span>
+                </div>
+
+                <div style="margin-top:10px;display:flex;gap:8px;align-items:center;">
+                    <input type="checkbox" id="check-corte-auto" checked>
+                    <label for="check-corte-auto">Activar corte automático</label>
+                </div>
+
+                <button class="btn-primary" id="btn-aplicar-umbrales"
+                    style="margin-top:10px;">Actualizar umbrales</button>
+
+                <p id="estado-umbrales-manual"
+                   style="margin-top:6px;font-size:12px;">Umbrales por defecto aplicados.</p>
+            </article>
+        </section>
+
+        <!-- FILA 3 -->
+        <section class="panel-grid">
+            <article class="card">
+                <h2>Diagnóstico y estado de servicios</h2>
+
+                <div class="panel-grid">
+                    <div class="kpi-card"><div class="kpi-label">API Backend</div><div class="kpi-value" id="diag-backend">--</div></div>
+                    <div class="kpi-card"><div class="kpi-label">Broker MQTT</div><div class="kpi-value" id="diag-mqtt">--</div></div>
+                    <div class="kpi-card"><div class="kpi-label">DB Series</div><div class="kpi-value" id="diag-db">--</div></div>
+                    <div class="kpi-card"><div class="kpi-label">WebSocket</div><div class="kpi-value" id="diag-ws">--</div></div>
+                </div>
+
+                <p style="margin-top:8px;font-size:13px;">
+                    Latencia: <span id="diag-latencia">-- ms</span>
+                </p>
+
+                <p id="diag-recomendaciones"
+                   style="margin-top:4px;font-size:12px;">
+                    Sin recomendaciones por ahora.
+                </p>
+            </article>
+        </section>
+
+        <!-- FILA 4 - Gráficos -->
+        <section class="charts-grid">
+            <article><h3>Potencia PV vs tiempo</h3><canvas id="graf1"></canvas></article>
+            <article><h3>Potencia de carga vs tiempo</h3><canvas id="graf2"></canvas></article>
+            <article><h3>Corriente batería vs tiempo</h3><canvas id="graf3"></canvas></article>
+            <article><h3>SoC batería vs tiempo</h3><canvas id="graf4"></canvas></article>
+        </section>
+
+    </section>
+
+
+
+
+    <!-- =========================================================
+        MODO AUTOMÁTICO
+    ========================================================== -->
+    <section id="modo-automatico" class="mode-section hidden">
+        <p style="padding:20px;color:#ccc;">Modo automático cargado.</p>
+    </section>
+
+    <!-- =========================================================
+        MODO ML
+    ========================================================== -->
+    <section id="modo-ml" class="mode-section hidden">
+        <p style="padding:20px;color:#ccc;">Modo ML cargado.</p>
+    </section>
+
+    <!-- =========================================================
+        MODO CONECTAR
+    ========================================================== -->
+    <section id="modo-conectar" class="mode-section hidden">
+        <p style="padding:20px;color:#ccc;">Modo conectar cargado.</p>
+    </section>
+
+
+    <!-- =========================================================
+        ALERTAS FLOTANTES
+    ========================================================== -->
+    <div id="alertas" class="alertas-container"></div>
+
+    <!-- =========================================================
+        PANEL DE LOGS GLOBAL
+    ========================================================== -->
+    <div id="panel-logs" class="logs-hidden">
+        <h3>Logs del Sistema</h3>
+        <div id="logs-contenido"></div>
+    </div>
+
+    <!-- =========================================================
+        JS PRINCIPAL (ES6)
+    ========================================================== -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script type="module" src="./js/main.js"></script>
+
+</body>
+</html>

@@ -1,0 +1,477 @@
+/* ============================================================
+ESTILO GLOBAL INDUSTRIAL — PROYECTO MICRORRED INTELIGENTE
+============================================================ */
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+body {
+    background-color: #020617;
+    color: #e2e8f0;
+    min-height: 100vh;
+    padding: 16px 32px 32px 32px;
+}
+
+/* ============================================================
+HEADER
+============================================================ */
+
+header, .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-bottom: 12px;
+    border-bottom: 1px solid #1e293b;
+    margin-bottom: 16px;
+}
+
+header h1 {
+    font-size: 24px;
+    letter-spacing: 1px;
+}
+
+header #clock {
+    font-size: 14px;
+    color: #94a3b8;
+}
+
+.btn-logs {
+    background: linear-gradient(180deg, #0f172a, #1f2937);
+    border-radius: 999px;
+    border: 1px solid rgba(56,189,248,0.7);
+    color: #e2e8f0;
+    padding: 6px 16px;
+    font-size: 13px;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.btn-logs:hover {
+    box-shadow: 0 0 14px rgba(56,189,248,0.8);
+}
+
+/* ============================================================
+NAVBAR DE MODOS
+============================================================ */
+
+.navbar-modes {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 20px;
+}
+
+.mode-btn {
+    padding: 10px 18px;
+    background: linear-gradient(180deg, #020617, #0f172a);
+    border: 1px solid #1e293b;
+    border-radius: 999px;
+    font-size: 14px;
+    color: #e5e7eb;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.mode-btn:hover {
+    border-color: #38bdf8;
+    box-shadow: 0 0 10px rgba(56,189,248,0.4);
+}
+
+.active-mode, .mode-btn.active {
+    background: linear-gradient(180deg, #0ea5e9, #0284c7);
+    color: #0f172a !important;
+    border: 1px solid #38bdf8 !important;
+    font-weight: 600;
+    box-shadow: 0 0 10px rgba(56,189,248,0.7);
+}
+
+/* ============================================================
+SECCIONES DE MODOS
+============================================================ */
+
+.mode-section {
+    display: none;
+    margin-top: 20px;
+}
+
+.mode-section:not(.hidden) {
+    display: block;
+}
+
+.hidden {
+    display: none !important;
+}
+
+/* ============================================================
+LAYOUT — PANEL CENTRAL
+============================================================ */
+
+.panel-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 20px;
+}
+
+.charts-grid {
+    margin-top: 30px;
+    display: grid;
+    gap: 30px;
+    grid-template-columns: repeat(auto-fit, minmax(440px, 1fr));
+}
+
+/* ============================================================
+TARJETAS GENERALES (CARDS)
+============================================================ */
+
+.card {
+    background: rgba(15,23,42,0.7);
+    border-radius: 18px;
+    border: 1px solid rgba(56,189,248,0.55);
+    box-shadow: 0 0 18px rgba(56,189,248,0.15);
+    padding: 16px 18px;
+}
+
+.card h2, .card h3 {
+    font-size: 17px;
+    font-weight: 700;
+    color: #38bdf8;
+    margin-bottom: 10px;
+}
+
+/* ============================================================
+BOTONES GLOBALES
+============================================================ */
+
+button {
+    font-family: inherit;
+}
+
+/* Botones normales */
+.btn-primary {
+    background: linear-gradient(180deg, #0f172a, #1f2937);
+    border-radius: 999px;
+    border: 1px solid rgba(56,189,248,0.7);
+    color: #e2e8f0;
+    padding: 6px 14px;
+    font-size: 13px;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.btn-primary:hover {
+    box-shadow: 0 0 14px rgba(56,189,248,0.8);
+}
+
+/* ============================================================
+BOTONES CIRCULARES INDUSTRIALES
+============================================================ */
+
+.circle-btn,
+.btn-circle {
+    width: 70px;
+    height: 70px;
+    border-radius: 50%;
+    border: none;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: 0.2s;
+    box-shadow: 0 0 10px rgba(0,0,0,0.4);
+}
+
+/* verde */
+.circle-btn.green,
+.btn-circle-green {
+    background: radial-gradient(circle, #4ade80 0%, #22c55e 80%);
+    border: 2px solid #bbf7d0;
+    color: #0f172a;
+}
+
+.circle-btn.green:hover,
+.btn-circle-green:hover {
+    box-shadow: 0 0 18px rgba(34,197,94,0.8);
+    transform: scale(1.06);
+}
+
+/* rojo */
+.circle-btn.red,
+.btn-circle-red {
+    background: radial-gradient(circle, #f87171 0%, #ef4444 80%);
+    border: 2px solid #fecaca;
+    color: #0f172a;
+}
+
+.circle-btn.red:hover,
+.btn-circle-red:hover {
+    box-shadow: 0 0 18px rgba(248,113,113,0.8);
+    transform: scale(1.06);
+}
+
+/* amarillo */
+.circle-btn.yellow,
+.btn-circle-yellow {
+    background: radial-gradient(circle, #fde047 0%, #facc15 80%);
+    border: 2px solid #fef9c3;
+    color: #0f172a;
+}
+
+.circle-btn.yellow:hover,
+.btn-circle-yellow:hover {
+    box-shadow: 0 0 18px rgba(250,204,21,0.8);
+    transform: scale(1.06);
+}
+
+/* azul */
+.circle-btn.blue,
+.btn-circle-blue {
+    background: radial-gradient(circle, #38bdf8 0%, #0284c7 80%);
+    border: 2px solid #7dd3fc;
+    color: #0f172a;
+}
+
+.circle-btn.blue:hover,
+.btn-circle-blue:hover {
+    box-shadow: 0 0 18px rgba(56,189,248,0.8);
+    transform: scale(1.06);
+}
+
+/* ============================================================
+INPUTS — SELECT, LABEL, SLIDER
+============================================================ */
+
+label {
+    display: block;
+    font-size: 13px;
+    color: #cbd5e1;
+    margin-top: 8px;
+    margin-bottom: 4px;
+}
+
+select {
+    width: 100%;
+    padding: 6px 8px;
+    border-radius: 10px;
+    border: 1px solid #1f2937;
+    background-color: #020617;
+    color: #e5e7eb;
+    margin-bottom: 8px;
+}
+
+/* slider */
+input[type="range"] {
+    width: 100%;
+}
+
+/* Slider moderno */
+input[type="range"]::-webkit-slider-thumb {
+    width: 16px;
+    height: 16px;
+    background: #38bdf8;
+    border-radius: 50%;
+    cursor: pointer;
+    box-shadow: 0 0 8px rgba(56,189,248,0.7);
+}
+
+.slider-with-value {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.slider-value {
+    font-size: 14px;
+    padding: 4px 10px;
+    border-radius: 6px;
+    background: #111827;
+    color: #9ca3af;
+    min-width: 60px;
+    text-align: right;
+}
+
+/* ============================================================
+KPI CARDS
+============================================================ */
+
+.kpi-card {
+    background: rgba(15,23,42,0.9);
+    border-radius: 16px;
+    border: 1px solid rgba(56,189,248,0.5);
+    padding: 10px 12px;
+    box-shadow: 0 0 12px rgba(56,189,248,0.2);
+}
+
+.kpi-label {
+    font-size: 11px;
+    color: #94a3b8;
+}
+
+.kpi-value {
+    font-size: 18px;
+    font-weight: 700;
+    color: #e5e7eb;
+}
+
+/* ============================================================
+GRÁFICOS
+============================================================ */
+
+canvas {
+    width: 100%;
+    background: rgba(15,23,42,0.9);
+    border-radius: 18px;
+    border: 1px solid rgba(30,64,175,0.6);
+    padding: 6px;
+    margin-bottom: 16px !important;
+}
+
+/* ============================================================
+ALERTAS FLOTANTES
+============================================================ */
+
+.alertas-container, #alertas {
+    position: fixed;
+    right: 24px;
+    bottom: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    z-index: 9999;
+}
+
+.alert-card {
+    min-width: 260px;
+    padding: 10px 12px;
+    border-radius: 14px;
+    color: #0f172a;
+    font-size: 13px;
+    font-weight: 600;
+    box-shadow: 0 0 14px rgba(0,0,0,0.5);
+}
+
+.alert-red {
+    background: #f97373;
+    border: 1px solid #fecaca;
+}
+
+.alert-yellow {
+    background: #fde047;
+    border: 1px solid #fef3c7;
+}
+
+.alert-green {
+    background: #4ade80;
+    border: 1px solid #bbf7d0;
+}
+
+/* ============================================================
+PANEL DE LOGS
+============================================================ */
+
+#panel-logs {
+    position: fixed;
+    right: 24px;
+    top: 80px;
+    width: 320px;
+    max-height: 420px;
+    background: rgba(15,23,42,0.96);
+    border-radius: 18px;
+    border: 1px solid rgba(56,189,248,0.6);
+    padding: 12px;
+    box-shadow: 0 0 18px rgba(56,189,248,0.4);
+    z-index: 9998;
+}
+
+.logs-hidden {
+    display: none;
+}
+
+.logs-visible {
+    display: block;
+}
+
+#logs-contenido {
+    font-size: 11px;
+    max-height: 360px;
+    overflow-y: auto;
+    padding-right: 6px;
+}
+
+/* Scroll industrial */
+::-webkit-scrollbar {
+    width: 6px;
+}
+::-webkit-scrollbar-track {
+    background: #0f172a;
+}
+::-webkit-scrollbar-thumb {
+    background: #38bdf8;
+    border-radius: 6px;
+}
+::-webkit-scrollbar-thumb:hover {
+    background: #0ea5e9;
+}
+
+/* ============================================================
+SECCIÓN RASPBERRY
+============================================================ */
+
+.raspberry-buttons-row {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 15px;
+}
+
+.raspberry-info-box {
+    background: #0f172a;
+    padding: 12px;
+    border-radius: 10px;
+    border: 1px solid #1e293b;
+    font-size: 14px;
+}
+
+/* ============================================================
+MODO AUTOMÁTICO — ESTILO INDUSTRIAL
+============================================================ */
+
+.fila-auto {
+    margin-top: 20px;
+    display: flex;
+    gap: 20px;
+    justify-content: space-between;
+}
+
+.auto-card {
+    flex: 1;
+    min-height: 250px;
+}
+
+/* ============================================================
+MODO ML / MODO TWIN
+============================================================ */
+
+.twin-panel, .ml-panel {
+    background: rgba(1,11,28,0.85);
+    border: 1px solid #1e3a8a;
+    border-radius: 14px;
+    padding: 18px;
+    box-shadow: 0 0 12px rgba(2,132,199,0.2);
+}
+
+/* ============================
+SECCIONES DE MODO (TABS)
+============================ */
+
+.mode-section {
+    margin-top: 18px;
+}
+
+/* Ocultar secciones cuando no están activas */
+.hidden {
+    display: none !important;
+}
